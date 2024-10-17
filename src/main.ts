@@ -53,11 +53,11 @@ async function setup(): Promise<void> {
 
   sdk = new MetaMaskSDK({
     logging: {
-      developerMode: true,
+      developerMode: false,
       plaintext: true,
     },
     communicationServerUrl: 'https://socketdev.siteed.net',
-    extensionOnly: false, // Changed to false to allow mobile connections
+    extensionOnly: true, // Changed to false to allow mobile connections
     checkInstallationImmediately: false,
     dappMetadata: {
       name: 'My Dapp',
@@ -456,7 +456,6 @@ async function handleSignMessage(): Promise<void> {
     });
     console.log('Signature:', signature);
     updateLastResponse(`Message signed successfully! Signature: ${signature}`);
-    alert('Message signed successfully!');
   } catch (error) {
     console.error('Failed to sign message:', error);
     if (error instanceof Error) {
