@@ -1,0 +1,2 @@
+- Add check for eip 6963
+- listens on sdk typed events
