@@ -53,7 +53,7 @@ async function setup(): Promise<void> {
 
   sdk = new MetaMaskSDK({
     logging: {
-      developerMode: false,
+      developerMode: true,
       plaintext: true,
     },
     communicationServerUrl: 'https://socketdev.siteed.net',
@@ -315,6 +315,7 @@ declare global {
 let currentModal: HTMLElement | null = null;
 let isModalOpen = false;
 let sdk: MetaMaskSDK;
+let listenersSetup = false;
 
 // Add this utility function to detect mobile browsers
 function isMobileBrowser(): boolean {
@@ -372,6 +373,11 @@ const displayQRCode = async (uri: string): Promise<void> => {
 // Update the handleConnectClick function
 async function handleConnectClick(): Promise<void> {
   console.log('Connect button clicked');
+  if (provider?.isConnected()) {
+    console.log('Already connected');
+    updateLastResponse('Already connected');
+    return;
+  }
   try {
     closeModal();
     await sdk.connect();
@@ -410,6 +416,7 @@ function closeModal(): void {
 // Update the connect button event listener
 const connectButton = document.getElementById('connectButton');
 if (connectButton) {
+  connectButton?.removeEventListener('click', handleConnectClick);
   connectButton.addEventListener('click', () => {
     handleConnectClick().catch(console.error);
   });
@@ -417,15 +424,14 @@ if (connectButton) {
 
 // Add the missing setupButtonListeners function
 function setupButtonListeners(): void {
-  const connectButton = document.querySelector<HTMLButtonElement>('#connectButton');
+  if (listenersSetup) return;
+
+  // Prevent duplicate listeners
+  listenersSetup = true;
   const signButton = document.querySelector<HTMLButtonElement>('#signButton');
   const terminateButton = document.querySelector<HTMLButtonElement>('#terminateButton');
   const changeAccountButton = document.querySelector<HTMLButtonElement>('#changeAccountButton');
   const refreshAccountsButton = document.querySelector<HTMLButtonElement>('#refreshAccountsButton');
-
-  // Remove existing event listeners before adding new ones
-  connectButton?.removeEventListener('click', handleConnectClick);
-  connectButton?.addEventListener('click', handleConnectClick);
 
   signButton?.removeEventListener('click', handleSignMessage);
   signButton?.addEventListener('click', handleSignMessage);
